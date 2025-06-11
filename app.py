@@ -1,8 +1,6 @@
-
 import streamlit as st
 from PIL import Image
 from ultralytics import YOLO
-import tempfile 
 import os
 import gdown
 
@@ -10,13 +8,10 @@ import gdown
 MODEL_FILE = "best1.pt"
 FILE_ID = "16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"
 
-
-
-
-# ✅ Set page config first
+# ✅ Set page config
 st.set_page_config(page_title="Wildlife Detection", layout="centered")
 
-# ✅ Background image from URL
+# ✅ Set background image
 def set_background(image_url):
     st.markdown(
         f"""
@@ -32,32 +27,35 @@ def set_background(image_url):
         unsafe_allow_html=True
     )
 
-# ✅ Add your image URL here
 background_url = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9yZXN0JTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D"
 set_background(background_url)
 
-# ✅ Title and UI
-st.title("🦓🐃 YOLOv5m6u Detection App🦏🐘")
-st.markdown("Upload an image to detect objects using your trained YOLOv5m6u model.")
+# ✅ Title and Instructions
+st.title("🦓🐃 YOLOv5m6u Detection App 🦏🐘")
+st.markdown("Upload an image to detect wildlife using your trained YOLOv5m6u model.")
 
-# ========== DOWNLOAD MODEL IF NEEDED ========== #
+# ✅ Download model if not available
 if not os.path.exists(MODEL_FILE):
-    with st.spinner("Downloading model from Google Drive..."):
-        url = f"https://drive.google.com/uc?id={FILE_ID}"
-        gdown.download(url, MODEL_FILE, quiet=False)
-    st.success("Model downloaded successfully!")
+    with st.spinner("🔄 Downloading model from Google Drive..."):
+        try:
+            url = f"https://drive.google.com/uc?id={FILE_ID}"
+            gdown.download(url, MODEL_FILE, quiet=False)
+            st.success("✅ Model downloaded successfully!")
+        except Exception as e:
+            st.error("❌ Model download failed. Please check the Google Drive link or access permissions.")
+            st.stop()
 
-
-# ✅ Load YOLOv5m6u model
+# ✅ Load model with caching
 @st.cache_resource
 def load_model():
-    return YOLO("best1.pt")  
+    return YOLO(MODEL_FILE)
 
 model = load_model()
 
-# ✅ Upload and detect
+# ✅ Upload image
 uploaded_file = st.file_uploader("📤 Upload an image", type=['jpg', 'jpeg', 'png'])
 
+# ✅ Run detection
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
     st.image(image, caption="📸 Uploaded Image", use_container_width=True)
