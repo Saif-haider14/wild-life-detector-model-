@@ -2,3 +2,4 @@ streamlit
 Pillow
 ultralytics
 gdown
+opencv-python
