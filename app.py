@@ -37,7 +37,7 @@ background_url = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?f
 set_background(background_url)
 
 # ✅ Title and UI
-st.title("🦓🐃 YOLOv5m6u Detection App"🦏🐘)
+st.title("🦓🐃 YOLOv5m6u Detection App🦏🐘")
 st.markdown("Upload an image to detect objects using your trained YOLOv5m6u model.")
 
 # ========== DOWNLOAD MODEL IF NEEDED ========== #
