@@ -36,7 +36,8 @@ except Exception as e:
     st.error(f"Failed to load model: {e}")
     st.stop()
 
-st.title("Wildlife Detection with YOLOv5m6u")
+st.title("🐃🦓Wildlife Detector App🐘🦏")
+st.write("My model detect rhino , zebra , elephant , buffalo")
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
