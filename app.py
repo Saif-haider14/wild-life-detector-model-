@@ -26,11 +26,11 @@ uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    st.image(image, caption="Uploaded Image", use_container_width=True)
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         image.save(tmp.name)
         results = model(tmp.name)
 
     result_image = results[0].plot()  # returns numpy image with boxes drawn
-    st.image(result_image, caption="Detection Result", use_column_width=True)
+    st.image(result_image, caption="Detection Result", use_container_width=True)
