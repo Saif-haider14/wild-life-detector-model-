@@ -12,8 +12,7 @@ import ultralytics.nn.tasks  # Ensure DetectionModel is imported
 add_safe_globals([ultralytics.nn.tasks.DetectionModel])
 
 # Google Drive file ID (from your share link)
-FILE_ID = "
-16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"
+FILE_ID = "16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"
 MODEL_PATH = "saif.pt"
 
 @st.cache_resource
