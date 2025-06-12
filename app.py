@@ -1,29 +1,22 @@
 import streamlit as st
-import torch
-import cv2
-import numpy as np
-import tempfile
 import gdown
+import tempfile
 from PIL import Image
-from torch.serialization import add_safe_globals
-import ultralytics.nn.tasks  # Ensure DetectionModel is imported
+from ultralytics import YOLO
 
-# Allow YOLOv5 DetectionModel class to be loaded from .pt
-add_safe_globals([ultralytics.nn.tasks.DetectionModel])
-
-# Google Drive file ID (from your share link)
+# Google Drive file ID and local model path
 FILE_ID = "16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"
 MODEL_PATH = "saif.pt"
 
 @st.cache_resource
-def download_model():
+def load_model():
     url = f"https://drive.google.com/uc?id={FILE_ID}"
     gdown.download(url, MODEL_PATH, quiet=False)
-    model = torch.load(MODEL_PATH, map_location=torch.device("cpu"), weights_only=False)
+    model = YOLO(MODEL_PATH)
     return model
 
 try:
-    model = download_model()
+    model = load_model()
 except Exception as e:
     st.error(f"Failed to load model: {e}")
     st.stop()
@@ -37,9 +30,7 @@ if uploaded_file:
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         image.save(tmp.name)
-        results = model(tmp.name)  # Inference
+        results = model(tmp.name)
 
-    # Draw boxes on the image (YOLOv5 renders in-place)
-    results.render()
-    result_img = Image.fromarray(results.ims[0])
-    st.image(result_img, caption="Detection Result", use_column_width=True)
+    result_image = results[0].plot()  # returns numpy image with boxes drawn
+    st.image(result_image, caption="Detection Result", use_column_width=True)
