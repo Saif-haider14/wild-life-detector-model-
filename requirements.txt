@@ -1,8 +1,5 @@
 streamlit
-torch>=2.0
-opencv-python
-numpy
-Pillow
+ultralytics
 gdown
-ultralytics==8.0.20
-
+Pillow
+opencv-python-headless
