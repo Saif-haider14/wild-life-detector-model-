@@ -8,7 +8,7 @@ import tempfile
 # ------------------ Configuration ------------------
 # Replace with your actual Google Drive file ID
 file_id = '16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ'  # e.g., '1a2b3c4D5EfGhIJKlMNopQRS6789'
-model_filename = 'best1.pt'
+model_filename = 'saif.pt'
 
 # ------------------ Download Model ------------------
 @st.cache_resource
