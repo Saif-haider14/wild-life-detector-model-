@@ -1,46 +1,40 @@
 import streamlit as st
 import torch
-import gdown
-import os
-from PIL import Image
 import cv2
 import numpy as np
+import tempfile
+import gdown
+from PIL import Image
 
-# Page config
-st.set_page_config(page_title="Wildlife Detector - YOLOv5m6u", layout="centered")
+# Google Drive ID for your model (Extract from your shareable link)
+FILE_ID = "16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"  # Replace with actual file ID
+MODEL_PATH = "saif.pt"
+
+@st.cache_resource
+def download_model():
+    url = f"https://drive.google.com/uc?id={FILE_ID}"
+    gdown.download(url, MODEL_PATH, quiet=False)
+    return torch.load(MODEL_PATH, map_location=torch.device("cpu"))
 
 # Load model
-@st.cache_resource
-def load_model():
-    file_id = "16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"  # 🔁 Replace with your actual file ID
-    url = f"https://drive.google.com/uc?id=16p2yZOPplA4BopdyPeJOr2bTWOePc2gQ"
-    model_path = "saif.pt"
+try:
+    model = download_model()
+except Exception as e:
+    st.error(f"Failed to load model: {e}")
+    st.stop()
 
-    if not os.path.exists(model_path):
-        gdown.download(url, model_path, quiet=False)
+st.title("Wildlife Detection App")
+uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-    model = torch.hub.load("ultralytics/yolov5", "custom", path=model_path, force_reload=False)
-    return model
-
-model = load_model()
-
-# UI
-st.title("🐾 Wildlife Detector with YOLOv5m6u")
-st.write("Upload an image and detect wildlife using your YOLOv5m6u model.")
-
-uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
-
-if uploaded_file is not None:
+if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_container_width=True)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    image_np = np.array(image)
-    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+        image.save(tmp.name)
+        results = model(tmp.name)  # YOLOv5 prediction
 
-    with st.spinner("Detecting..."):
-        results = model(image_bgr)
-        results.render()
-        detected_img = results.imgs[0]
-        st.image(detected_img[:, :, ::-1], caption="Detection Result", use_container_width=True)
-
-    st.success("Detection complete!")
+    # Plot results
+    results.render()
+    result_img = Image.fromarray(results.ims[0])
+    st.image(result_img, caption="Detected Image", use_column_width=True)
